@@ -149,6 +149,9 @@ void test_for_k(int k){
 	std::cout << "Accuracy for " << k << ": " << ((double)correct/all)*100 << "%" << std::endl;
 }
 
+void input_coords();
+void plot_percentage();
+
 int main(){
 
 	// parse assignment files
@@ -163,25 +166,70 @@ int main(){
 	// test
 	test_for_k(k);
 
-	// input loop
+	// core loop
+	int option;
 	while(1){
-		std::cout << std::endl;
-
-		// get new K
-		std::cout << "Input new K (0 to exit) ";
-		std::cin >> k;
-		if(k <= 0)
-			break;
-
-		// get new point data
-		point p;
-		std::cout << "Input test coordinates: ";
-		for(int i = 0; i < COORD_NUM; i++)
-			std::cin >> p.coords[i];
-
-		// create and process point
-		std::cout << "Predicted for " << print_coords(p.coords) << ": " << knn(train_data, p, k) << std::endl;
+		std::cout << std::endl << "Exit (0), input test coordinates (1) or plot accuracy percentage (2): ";
+		std::cin >> option;
+		switch(option){
+			case 0: return 0;
+			case 1: input_coords(); break;
+			case 2: plot_percentage(); break;
+		}
 	}
 
 	return 0;
 }
+
+void input_coords(){
+	int k = 0;
+	point p;
+
+	// get new K
+	std::cout << "Input new K: ";
+	std::cin >> k;
+	if(k <= 0)
+		return;
+
+	// get new point data
+	std::cout << "Input test coordinates: ";
+	for(int i = 0; i < COORD_NUM; i++)
+		std::cin >> p.coords[i];
+
+	// create and process point
+	std::cout << "Predicted for " << print_coords(p.coords) << ": " << knn(train_data, p, k) << std::endl;
+}
+
+void plot_percentage(){
+	// read range
+	int min, max;
+	std::cout << "Enter range of k (inclusive): ";
+	std::cin >> min >> max;
+
+	// set up variables
+	int correct = 0;
+	std::string predicted = "";
+	const int all = test_data.size();
+	const auto end = test_data.end();
+
+	// iterate through test_data for every k
+	std::cout << "Accuracy plot for range of k [" << min << ", " << max << "]:" << std::endl;
+	for(int k = min; k <= max; k++){
+		std::cout << std::setw(5) << std::left << k;
+		correct = 0;
+		for(auto it = test_data.begin(); it != end; it++)
+			correct += knn(train_data, *it, k) == it->iris;
+		int i = 0;
+		std::cout << '|';
+		for(; i < correct; i++)
+			std::cout << '*';
+		for(; i < all; i++)
+			std::cout << '.';
+		std::cout << "| " << ((double)correct/all*100) << "%" << std::endl;
+	}
+}
+
+
+
+
+
