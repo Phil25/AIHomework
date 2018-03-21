@@ -27,12 +27,12 @@ std::vector<point> train_data;
 std::vector<point> test_data;
 
 // prints point's coordinates
-std::string print_point(point& p){
+std::string print_coords(double coords[COORD_NUM]){
 	std::ostringstream oss;
 
 	oss << '{';
 	for(int i = 0; i < COORD_NUM; i++)
-		oss << p.coords[i] << (i == COORD_NUM -1 ? "" : ", ");
+		oss << coords[i] << (i == COORD_NUM -1 ? "" : ", ");
 	oss << '}';
 
 	return oss.str();
@@ -121,7 +121,7 @@ std::string knn(std::vector<point>& vec, point& p, int k){
 // calculate k neighbours
 void test_for_k(int k){
 	int all = 0, correct = 0;
-	print3col(25, "Coordinates", "Correct", "Predicted");
+	print3col(25, "COORDINATES", "CORRECT", "PREDICTED");
 	std::cout << std::endl;
 
 	// iterate through test data
@@ -131,7 +131,7 @@ void test_for_k(int k){
 		std::string predicted = knn(train_data, *it, k);
 
 		// print info
-		print3col(25, print_point(*it), it->iris, predicted);
+		print3col(25, print_coords(it->coords), it->iris, predicted);
 		
 		// mark incorrect guesses
 		bool is_correct = it->iris == predicted;
@@ -162,6 +162,26 @@ int main(){
 
 	// test
 	test_for_k(k);
+
+	// input loop
+	while(1){
+		std::cout << std::endl;
+
+		// get new K
+		std::cout << "Input new K (0 to exit) ";
+		std::cin >> k;
+		if(k <= 0)
+			break;
+
+		// get new point data
+		point p;
+		std::cout << "Input test coordinates: ";
+		for(int i = 0; i < COORD_NUM; i++)
+			std::cin >> p.coords[i];
+
+		// create and process point
+		std::cout << "Predicted for " << print_coords(p.coords) << ": " << knn(train_data, p, k) << std::endl;
+	}
 
 	return 0;
 }
