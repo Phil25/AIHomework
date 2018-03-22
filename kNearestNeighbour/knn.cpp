@@ -40,7 +40,6 @@ std::string print_coords(double coords[COORD_NUM]){
 
 // prints 3 columns of data
 void print3col(int col_dist, std::string s1, std::string s2, std::string s3){
-//	std::cout << s1 << std::left << std::setw(100) << std::left << s2 << std::setw(col_dist -s2.length()) << s3 << std::endl;
 	std::cout << std::fixed;
 	std::cout << std::setw(col_dist) << std::left << s1 << std::setw(col_dist) << std::left << s2 << s3;
 }
@@ -228,8 +227,3 @@ void plot_percentage(){
 		std::cout << "| " << ((double)correct/all*100) << "%" << std::endl;
 	}
 }
-
-
-
-
-
