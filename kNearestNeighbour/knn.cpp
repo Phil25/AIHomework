@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <fstream>
@@ -13,6 +14,10 @@ struct point{
 	std::string iris;
 	double coords[COORD_NUM];
 	double distance;
+
+	bool operator<(const point& other){
+		return this->distance < other.distance;
+	}
 };
 
 // comp struct for comparing points in priority queue
@@ -156,6 +161,7 @@ int main(){
 	// parse assignment files
 	read_data("train.txt", train_data);
 	read_data("test.txt", test_data);
+	std::sort(train_data.begin(), train_data.end());
 
 	// read k from user
 	int k;
