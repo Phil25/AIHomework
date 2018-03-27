@@ -8,7 +8,7 @@ double small_rand(double max){
 	std::srand(seed);
 	double result = (double)std::rand() /RAND_MAX *max;
 	seed *= result;
-	return result;
+	return 0.0;
 }
 
 perc::perc(const unsigned int num_of_coords, const double learning_param):
