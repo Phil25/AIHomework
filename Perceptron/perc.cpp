@@ -39,10 +39,10 @@ bool perc::get(const double* inputs){
 }
 
 // perception learning rule application
-void perc::tune(const double* inputs, bool actual, bool correct){
-	// W = W + (y-d) a X
+void perc::tune(const double* inputs, bool correct, bool actual){
+	// W = W + (d-y) a X
 	for(unsigned int i = 0; i < num_of_coords; i++)
-		weights[i] += (actual -correct) *learning_param *inputs[i];
+		weights[i] += (correct -actual) *learning_param *inputs[i];
 	// O = O - (d-y) a
 	threshold -= (correct-actual) *learning_param;
 }

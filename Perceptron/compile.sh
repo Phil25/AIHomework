@@ -1,3 +1,3 @@
 #!/bin/bash
 
-g++ perc.cpp perc_test.cpp -o perc
+g++ perc.cpp main.cpp -o perc
