@@ -16,7 +16,6 @@ int main(){
 	}
 
 	std::cout << data.size() << " languages detected." << std::endl;
-	std::cout << dr::to_string(data) << std::endl;
 
 	return 0;
 }

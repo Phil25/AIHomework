@@ -14,7 +14,7 @@
 
 struct lang_data{
 	std::string lang;
-	std::vector<std::array<int, LETTER_COUNT>> letters;
+	std::vector<std::array<float, LETTER_COUNT>> freq;
 };
 
 namespace dr{
@@ -51,19 +51,26 @@ bool get_lang_data(const char* dir_name, std::vector<lang_data>& data){
 			file_name.append("/").append(file->d_name);
 
 			char c;
-			std::array <int, LETTER_COUNT> cur_letters{0};
+			std::array <float, LETTER_COUNT> cur_freq{0};
 			std::fstream fs(file_name, std::fstream::in);
 
+			int all = 0;
 			// read file char by char
 			while(fs >> std::noskipws >> c){
 				int index = std::tolower(c) -LETTER_OFFSET;
 				index = in_bounds(index, 0, LETTER_COUNT -1);
 
-				if(index != -1)
-					cur_letters[index]++;
+				if(index == -1)
+					continue;
+
+				cur_freq[index]++;
+				all++;
 			}
 
-			cur_lang.letters.push_back(cur_letters);
+			for(int i = 0; i < LETTER_COUNT; i++)
+				cur_freq[i] /= all;
+
+			cur_lang.freq.push_back(cur_freq);
 		}
 		closedir(subdir);
 		data.push_back(cur_lang);
@@ -81,8 +88,8 @@ std::string to_string(std::vector<lang_data>& data){
 		oss << it->lang << std::endl;
 		
 		// iterate letter vectors
-		auto letend = it->letters.end();
-		for(auto letit = it->letters.begin(); letit != letend; letit++){
+		auto letend = it->freq.end();
+		for(auto letit = it->freq.begin(); letit != letend; letit++){
 
 			oss << "\tFile" << std::endl;
 			// iterate actual letters
