@@ -1,8 +1,10 @@
 #include <dirent.h>
 #include <string>
 #include <vector>
+#include <array>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #ifndef DATA_READER_H
 #define DATA_READER_H
@@ -12,7 +14,7 @@
 
 struct lang_data{
 	std::string lang;
-	int letters[LETTER_COUNT]{0};
+	std::vector<std::array<int, LETTER_COUNT>> letters;
 };
 
 namespace dr{
@@ -32,11 +34,11 @@ bool get_lang_data(const char* dir_name, std::vector<lang_data>& data){
 		if(file->d_name[0] == '.')
 			continue;
 
-		lang_data cur_lang = {};
+		lang_data cur_lang{};
 		cur_lang.lang = file->d_name;
 
 		std::string subdir_name(dir_name);
-		subdir_name.append("/").append(file->d_name).c_str();
+		subdir_name.append("/").append(file->d_name);
 
 		DIR* subdir = opendir(subdir_name.c_str());
 
@@ -45,18 +47,23 @@ bool get_lang_data(const char* dir_name, std::vector<lang_data>& data){
 			if(file->d_name[0] == '.')
 				continue;
 
+			std::string file_name(subdir_name); 
+			file_name.append("/").append(file->d_name);
+
 			char c;
-			std::string file_name = subdir_name.append("/").append(file->d_name);
+			std::array <int, LETTER_COUNT> cur_letters{0};
 			std::fstream fs(file_name, std::fstream::in);
 
 			// read file char by char
 			while(fs >> std::noskipws >> c){
-				int index = c -LETTER_OFFSET;
+				int index = std::tolower(c) -LETTER_OFFSET;
 				index = in_bounds(index, 0, LETTER_COUNT -1);
 
 				if(index != -1)
-					cur_lang.letters[index]++;
+					cur_letters[index]++;
 			}
+
+			cur_lang.letters.push_back(cur_letters);
 		}
 		closedir(subdir);
 		data.push_back(cur_lang);
@@ -66,12 +73,22 @@ bool get_lang_data(const char* dir_name, std::vector<lang_data>& data){
 }
 
 std::string to_string(std::vector<lang_data>& data){
+	//return "";
 	std::ostringstream oss;
 	auto end = data.end();
+	// iterate languages
 	for(auto it = data.begin(); it != end; it++){
 		oss << it->lang << std::endl;
-		for(int i = 0; i < LETTER_COUNT; i++)
-			oss << '\t' << (char)(i +LETTER_OFFSET) << " - " << it->letters[i] << std::endl;
+		
+		// iterate letter vectors
+		auto letend = it->letters.end();
+		for(auto letit = it->letters.begin(); letit != letend; letit++){
+
+			oss << "\tFile" << std::endl;
+			// iterate actual letters
+			for(int i = 0; i < LETTER_COUNT; i++)
+				oss << "\t\t" << (char)(i +LETTER_OFFSET) << " - " << (*letit)[i] << std::endl;
+		}
 	}
 	return oss.str();
 }
