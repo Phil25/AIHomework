@@ -8,6 +8,7 @@ std::vector<lang_data> data;
 
 int main(){
 
+	// read data
 	std::string dir_name = "./training";
 	if(!dr::get_lang_data(dir_name.c_str(), data)){
 		std::cout << "Cannot open directory" << std::endl;
