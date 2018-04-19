@@ -29,12 +29,10 @@ void normalize_vector(std::vector<double> v, int size){
 perc::perc(const unsigned int num_of_coords, const double learning_param):
 	num_of_coords(num_of_coords),
 	threshold(small_rand(5)),
-	weights(new double[num_of_coords]),
 	learning_param(learning_param)
 {
 	// initialize the weights vector
 	weights = std::vector<double>(num_of_coords);
-	std::cout << &weights << std::endl;
 	for(unsigned int i = 0; i < num_of_coords; i++)
 		weights[i] = small_rand(5);
 
