@@ -1,3 +1,3 @@
 #!/bin/bash
 
-g++ perc.cpp main.cpp -o olne
+g++ perc.cpp layer.cpp main.cpp -o olne

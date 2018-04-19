@@ -1,20 +1,19 @@
 #include <dirent.h>
-#include <string>
 #include <vector>
 #include <array>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
 #ifndef DATA_READER_H
 #define DATA_READER_H
 
-#define LETTER_COUNT 26
+#define LETTER_COUNT 4//26
+#define DOCUMENT_COUNT 3
 #define LETTER_OFFSET 97
 
 struct lang_data{
 	std::string lang;
-	std::vector<std::array<float, LETTER_COUNT>> freq;
+	std::vector<std::array<double, LETTER_COUNT>> freq;
 };
 
 namespace dr{
@@ -41,17 +40,21 @@ bool get_lang_data(const char* dir_name, std::vector<lang_data>& data){
 		subdir_name.append("/").append(file->d_name);
 
 		DIR* subdir = opendir(subdir_name.c_str());
+		int doc_limit = 0;
 
 		// loop training/<lang> directory
 		while((file = readdir(subdir)) != NULL){
 			if(file->d_name[0] == '.')
 				continue;
 
-			std::string file_name(subdir_name); 
+			if(++doc_limit > DOCUMENT_COUNT)
+				break;
+
+			std::string file_name(subdir_name);
 			file_name.append("/").append(file->d_name);
 
 			char c;
-			std::array <float, LETTER_COUNT> cur_freq{0};
+			std::array <double, LETTER_COUNT> cur_freq{0};
 			std::fstream fs(file_name, std::fstream::in);
 
 			int all = 0;
@@ -85,9 +88,18 @@ std::string to_string(std::vector<lang_data>& data){
 	auto end = data.end();
 	// iterate languages
 	for(auto it = data.begin(); it != end; it++){
-		oss << it->lang << std::endl;
-		
+		oss << std::endl << it->lang << std::endl;
+
+		for(int i = 0; i < LETTER_COUNT; i++){
+			auto letend = it->freq.end();
+			for(auto letit = it->freq.begin(); letit != letend; letit++){
+				oss << "\t" << (char)(i +LETTER_OFFSET) << " - " << (*letit)[i] << ' ';
+			}
+			oss << std::endl;
+		}
+
 		// iterate letter vectors
+		/*
 		auto letend = it->freq.end();
 		for(auto letit = it->freq.begin(); letit != letend; letit++){
 
@@ -95,7 +107,7 @@ std::string to_string(std::vector<lang_data>& data){
 			// iterate actual letters
 			for(int i = 0; i < LETTER_COUNT; i++)
 				oss << "\t\t" << (char)(i +LETTER_OFFSET) << " - " << (*letit)[i] << std::endl;
-		}
+		}*/
 	}
 	return oss.str();
 }

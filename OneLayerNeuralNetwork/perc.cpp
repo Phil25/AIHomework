@@ -1,5 +1,7 @@
 #include <random>
 #include <ctime>
+#include <math.h>
+
 #include "perc.h"
 
 double seed = std::time(0);
@@ -8,7 +10,20 @@ double small_rand(double max){
 	std::srand(seed);
 	double result = (double)std::rand() /RAND_MAX *max;
 	seed *= result;
-	return 2;
+	return 1;
+}
+
+double get_vector_length(double* v, int size){
+	double sumsq = 0.0;
+	for(int i = 0; i < size; i++)
+		sumsq += v[i] *v[i];
+	return std::sqrt(sumsq);
+}
+
+void normalize_vector(double* v, int size){
+	double len = get_vector_length(v, size);
+	for(int i = 0; i < size; i++)
+		v[i] /= len;
 }
 
 perc::perc(const unsigned int num_of_coords, const double learning_param):
@@ -17,35 +32,36 @@ perc::perc(const unsigned int num_of_coords, const double learning_param):
 	threshold(small_rand(5)),
 	learning_param(learning_param)
 {
-	std::cout << "learning: " << learning_param << std::endl;
 	for(unsigned int i = 0; i < num_of_coords; i++)
 		weights[i] = small_rand(5);
+	normalize_vector(weights, num_of_coords);
 }
 
 perc::~perc(){
 	delete [] weights;
 }
 
-double perc::get_threshold(){
-	return threshold;
-}
-
 // perceptron decision method
-bool perc::get(const double* inputs){
-	// SUM(x[i] *w[i]) >= threshold
-	double sum = 0.0;
+double perc::get(const double* inputs){
+	// net = SUM(x[i] *w[i])
+	double net = 0.0;
 	for(unsigned int i = 0; i < num_of_coords; i++)
-		sum += weights[i] *inputs[i];
-	return sum >= threshold;
+		net += weights[i] *inputs[i];
+
+	// return sigmoid of net
+	return 1/(1 +std::exp(-net));
 }
 
+// TODO: ask about net, whether the threshold is involved
 // perception learning rule application
-void perc::tune(const double* inputs, bool correct, bool actual){
-	// W = W + (d-y) a X
+void perc::tune(const double* inputs, double correct, double actual){
+	// W = W + n (d - y)y(1 - y)X
+	double delta = learning_param *(correct -actual) *actual *(1 -actual);
 	for(unsigned int i = 0; i < num_of_coords; i++)
-		weights[i] += (correct -actual) *learning_param *inputs[i];
-	// O = O - (d-y) a
-	threshold -= (correct-actual) *learning_param;
+		weights[i] += delta *inputs[i];
+
+	// normalize weighs
+	normalize_vector(weights, num_of_coords);
 }
 
 std::ostream& operator<<(std::ostream& os, const perc& p){
