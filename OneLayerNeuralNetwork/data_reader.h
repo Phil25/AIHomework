@@ -7,8 +7,8 @@
 #ifndef DATA_READER_H
 #define DATA_READER_H
 
-#define LETTER_COUNT 4//26
-#define DOCUMENT_COUNT 3
+#define LETTER_COUNT 26
+#define DOCUMENT_COUNT 10
 #define LETTER_OFFSET 97
 
 struct lang_data{

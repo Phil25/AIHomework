@@ -13,14 +13,14 @@ double small_rand(double max){
 	return 1;
 }
 
-double get_vector_length(double* v, int size){
+double get_vector_length(std::vector<double> v, int size){
 	double sumsq = 0.0;
 	for(int i = 0; i < size; i++)
 		sumsq += v[i] *v[i];
 	return std::sqrt(sumsq);
 }
 
-void normalize_vector(double* v, int size){
+void normalize_vector(std::vector<double> v, int size){
 	double len = get_vector_length(v, size);
 	for(int i = 0; i < size; i++)
 		v[i] /= len;
@@ -28,17 +28,18 @@ void normalize_vector(double* v, int size){
 
 perc::perc(const unsigned int num_of_coords, const double learning_param):
 	num_of_coords(num_of_coords),
-	weights(new double[num_of_coords]),
 	threshold(small_rand(5)),
+	weights(new double[num_of_coords]),
 	learning_param(learning_param)
 {
+	// initialize the weights vector
+	weights = std::vector<double>(num_of_coords);
+	std::cout << &weights << std::endl;
 	for(unsigned int i = 0; i < num_of_coords; i++)
 		weights[i] = small_rand(5);
-	normalize_vector(weights, num_of_coords);
-}
 
-perc::~perc(){
-	delete [] weights;
+	// initial weights normalization
+	normalize_vector(weights, num_of_coords);
 }
 
 // perceptron decision method
