@@ -7,6 +7,32 @@
 
 std::vector<lang_data> data;
 
+std::array<double, LETTER_COUNT> get_freq(std::string data){
+	std::array<double, LETTER_COUNT> freq{0};
+	int all = 0, size = data.length();
+	for(int i = 0; i < size; i++){
+		int index = std::tolower(data[i]) -'a';
+		index = dr::in_bounds(index, 0, LETTER_COUNT -1);
+
+		if(index == -1)
+			continue;
+
+		freq[index]++;
+		all++;
+	}
+	for(int i = 0; i < LETTER_COUNT; i++)
+		freq[i] /= all;
+	return freq;
+}
+
+void loop_user_input(layer& l){
+	std::string line;
+	std::cout << "Enter phrase:" << std::endl;
+	std::getline(std::cin, line);
+	int lang = l.get(get_freq(line).begin());
+	std::cout << "Detected: " << data[lang].lang << std::endl;
+}
+
 int main(){
 
 	// read data
@@ -61,6 +87,9 @@ int main(){
 			std::cout << std::endl;
 		}
 	std::cout << "Accuracy: " << (accuracy/(lang_count *DOCUMENT_COUNT)*100) << '%' << std::endl;
+
+	while(1)
+		loop_user_input(l);
 
 	return 0;
 }

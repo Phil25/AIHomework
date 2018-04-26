@@ -60,7 +60,7 @@ bool get_lang_data(const char* dir_name, std::vector<lang_data>& data){
 			int all = 0;
 			// read file char by char
 			while(fs >> std::noskipws >> c){
-				int index = std::tolower(c) -LETTER_OFFSET;
+				int index = std::tolower(c) -'a';
 				index = in_bounds(index, 0, LETTER_COUNT -1);
 
 				if(index == -1)
