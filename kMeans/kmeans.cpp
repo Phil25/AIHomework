@@ -1,6 +1,8 @@
 #include "data_reader.h"
 #include <ctime>
 
+//#define TEST
+
 #define loop_data(data, it)\
 	for(auto it = data.begin(); it != data.end(); it++)
 // ^ unoptimized -- data.end() executed every iteration :c
@@ -84,27 +86,25 @@ bool reassign_points(pvector& data, cvector& clusteroids, int k){
 		it->owner = get_closest_clusteroid(it->coords, clusteroids, k);
 		if(old_owner != it->owner){
 			assigns_made = true;
-			std::cout << old_owner << " -> " << it->owner << " @ " << to_str(it->coords) << std::endl;
+			std::cout << old_owner << " -> " << it->owner << " for " << to_str(it->coords) << std::endl;
 		}
 	}
 	return assigns_made;
 }
 
-void kmeans(const int k, pvector& data){
+void kmeans(const int k, pvector& data, cvector& clusteroids){
 	// randomize initial clusters
 	loop_data(data, it)
 		it->owner = rand(k);
 
-	// initialize vector of clusteroids and their number of points
-	cvector clusteroids;
+	// vector of amount of points for every clusteroid
 	ivector count;
 
 	// main k-means loop
 	bool assigns_made = false;
 	int iter_count = 0;
 	do{
-		std::cout << "=============" << std::endl;
-		std::cout << "ITERATION: " << ++iter_count << std::endl;
+		std::cout << "\nITERATION: " << ++iter_count << std::endl;
 		assigns_made = false;
 
 		reset_cluster_data(clusteroids, count, k);
@@ -115,18 +115,40 @@ void kmeans(const int k, pvector& data){
 			assigns_made = true;
 
 	}while(assigns_made);
+	std::cout << "No changes..." << std::endl;
+}
+
+void input_loop(int k, cvector& clusteroids){
+	point p;
+
+	// get new point data
+	std::cout << "\nInput test coordinates: ";
+	for(int i = 0; i < COORD_NUM; i++)
+		std::cin >> p.coords[i];
+
+	int i = get_closest_clusteroid(p.coords, clusteroids, k);
+	std::cout << to_str(p.coords) << " assigned to " << i << '.' << std::endl;
 }
 
 int main(){
 	// parse test file
-	std::vector<point> data;
+	pvector data;
 	dr::read_data("test.txt", data);
 
 	// read k from user
 	int k = 3;
-	//std::cout << "Number of clusters: ";
-	//std::cin >> k;
+#ifndef TEST
+	std::cout << "Number of clusters: ";
+	std::cin >> k;
+#endif
 
-	kmeans(k, data);
+	// vector of clusteroids
+	cvector clusteroids;
+
+	// run the kmeans algorithm
+	kmeans(k, data, clusteroids);
+
+	while(1)
+		input_loop(k, clusteroids);
 
 }
