@@ -92,30 +92,23 @@ bool reassign_points(pvector& data, cvector& clusteroids, int k){
 	return assigns_made;
 }
 
-void kmeans(const int k, pvector& data, cvector& clusteroids){
-	// randomize initial clusters
-	loop_data(data, it)
-		it->owner = rand(k);
+void print_sums(pvector& data, int k){
+}
 
+bool iteration(pvector& data, cvector& clusteroids, int k){
 	// vector of amount of points for every clusteroid
-	ivector count;
+	static ivector count;
 
-	// main k-means loop
-	bool assigns_made = false;
-	int iter_count = 0;
-	do{
-		std::cout << "\nITERATION: " << ++iter_count << std::endl;
-		assigns_made = false;
+	static int iter_count = 0;
+	std::cout << "\nITERATION: " << ++iter_count << std::endl;
 
-		reset_cluster_data(clusteroids, count, k);
+	reset_cluster_data(clusteroids, count, k);
 
-		find_clusters(data, clusteroids, count, k);
+	find_clusters(data, clusteroids, count, k);
 
-		if(reassign_points(data, clusteroids, k))
-			assigns_made = true;
+	print_sums(data, k);
 
-	}while(assigns_made);
-	std::cout << "No changes..." << std::endl;
+	return reassign_points(data, clusteroids, k);
 }
 
 void input_loop(int k, cvector& clusteroids){
@@ -133,7 +126,7 @@ void input_loop(int k, cvector& clusteroids){
 int main(){
 	// parse test file
 	pvector data;
-	dr::read_data("test.txt", data);
+	dr::read_data("train.txt", data);
 
 	// read k from user
 	int k = 3;
@@ -145,8 +138,13 @@ int main(){
 	// vector of clusteroids
 	cvector clusteroids;
 
-	// run the kmeans algorithm
-	kmeans(k, data, clusteroids);
+	// randomize initial clusters
+	loop_data(data, it)
+		it->owner = rand(k);
+
+	// main k-means loop
+	while(iteration(data, clusteroids, k));
+	std::cout << "No changes..." << std::endl;
 
 	while(1)
 		input_loop(k, clusteroids);
