@@ -34,3 +34,9 @@ Homework assignments for the AI subject at PJWSTK (NAI)
 
 * K-Means algorithm tested on iris class data.
 * Used for finding iris clusters.
+
+### Naive Bayes Classifier
+#### 10.05.18
+
+* Naive Bayes algorithm run on car class data.
+* Allows for inputting new examples.
