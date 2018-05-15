@@ -1,8 +1,8 @@
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <iomanip>
+#include <array>
+#include <set>
 
 // number of coordinates in the data set
 #define ATTRIB_COUNT 7
@@ -30,39 +30,50 @@ struct car{
 	str luggage_size;
 	str safety;
 	str acceptability;
-	
-	// number of different values for each attribute
-	static int7 diff_vals;
+
+	// number of unique values for each attribute
+	static int7 unique;
 	friend std::ostream& operator<<(std::ostream&, const car&);
 
 };
 
-int7 car::diff_vals{0};
+int7 car::unique{0};
+
+// hidden cout wrappers
+namespace{
+	void print_line(std::ostream& oss, std::string property, std::string value, std::string end){
+		oss << COLOR_PROP << property << COLOR_RESET << ": " << COLOR_VAL << value << COLOR_RESET << end;
+	}
+
+	void print_line(std::ostream& oss, std::string property, int value, std::string end){
+		oss << COLOR_PROP << property << COLOR_RESET << ": " << COLOR_VAL << value << COLOR_RESET << end;
+	}
+}
 
 std::ostream& operator<<(std::ostream& oss, const car& c){
 	oss << '{';
-	oss << COLOR_PROP << "b. price" << COLOR_RESET << ": " << COLOR_VAL << c.buying_price << COLOR_RESET << ", ";
-	oss << COLOR_PROP << "m. price" << COLOR_RESET << ": " << COLOR_VAL << c.maintenance_price << COLOR_RESET << ", ";
-	oss << COLOR_PROP << "door num" << COLOR_RESET << ": " << COLOR_VAL << c.door_num << COLOR_RESET << ", ";
-	oss << COLOR_PROP << "capacity" << COLOR_RESET << ": " << COLOR_VAL << c.capacity << COLOR_RESET << ", ";
-	oss << COLOR_PROP << "luggage" << COLOR_RESET << ": " << COLOR_VAL << c.luggage_size << COLOR_RESET << ", ";
-	oss << COLOR_PROP << "safety" << COLOR_RESET << ": " << COLOR_VAL << c.safety << COLOR_RESET << ", ";
-	oss << COLOR_PROP << "acceptability" << COLOR_RESET << ": " << COLOR_VAL << c.acceptability << COLOR_RESET;
+	print_line(oss, "b. price", c.buying_price, ", ");
+	print_line(oss, "m. price", c.maintenance_price, ", ");
+	print_line(oss, "door num", c.door_num, ", ");
+	print_line(oss, "capacity", c.capacity, ", ");
+	print_line(oss, "luggage", c.luggage_size, ", ");
+	print_line(oss, "safety", c.safety, ", ");
+	print_line(oss, "acceptability", c.acceptability, "");
 	oss << '}';
 	return oss;
 }
 
 namespace dr{
 
-	// file-private
+	// hidden readers
 	namespace{
-		std::string read_str(std::istringstream& iss){ 
+		std::string read_str(std::istringstream& iss){
 			std::string data;
 			std::getline(iss, data, ',');
 			return data;
 		}
 
-		int read_int(std::istringstream& iss){ 
+		int read_int(std::istringstream& iss){
 			return std::atoi(read_str(iss).c_str());
 		}
 
@@ -91,6 +102,37 @@ namespace dr{
 		std::string data;
 		while(std::getline(fs, data))
 			vec.push_back(parse_line(data));
+	}
+
+	// I am aware this function is an ugly mess
+	void calc_unique_values(std::vector<car>& data){
+
+		// sets for each attribute
+		std::set<std::string> buying_prices;
+		std::set<std::string> maintenance_prices;
+		std::set<int> door_nums;
+		std::set<int> capacities;
+		std::set<std::string> luggage_sizes;
+		std::set<std::string> safeties;
+
+		// fill the sets
+		auto end = data.end();
+		for(auto it = data.begin(); it != end; it++){
+			buying_prices.insert(it->buying_price);
+			maintenance_prices.insert(it->maintenance_price);
+			door_nums.insert(it->door_num);
+			capacities.insert(it->capacity);
+			luggage_sizes.insert(it->luggage_size);
+			safeties.insert(it->safety);
+		}
+
+		// get the unique values
+		car::unique[0] = buying_prices.size();
+		car::unique[1] = maintenance_prices.size();
+		car::unique[2] = door_nums.size();
+		car::unique[3] = capacities.size();
+		car::unique[4] = luggage_sizes.size();
+		car::unique[5] = safeties.size();
 	}
 
 }
