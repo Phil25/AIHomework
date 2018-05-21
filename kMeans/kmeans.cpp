@@ -93,6 +93,9 @@ void find_clusters(pvector& data, cvector& centroids, ivector& count, int k){
 		count[it->owner]++;
 	}
 
+	for(int i = 0; i < k; i++)
+		std::cout << i << ". Count: " << count[i] << std::endl;
+
 	// divide to get the average
 	for(int i = 0; i < k; i++)
 		for(int j = 0; j < COORD_NUM; j++)
@@ -104,7 +107,7 @@ int get_closest_centroid(darray& coords, cvector& centroids, int k){
 	double closest_dist = 999999999999999999.0;
 	for(int i = 0; i < k; i++){
 		double dist = distsqr(coords, centroids[i]);
-		if(dist > closest_dist)
+		if(dist >= closest_dist)
 			continue;
 		closest_dist = dist;
 		closest_id = i;
