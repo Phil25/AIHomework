@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <set>
+#include <map>
 
 // number of coordinates in the data set
 #define ATTRIB_COUNT 7
@@ -25,22 +26,27 @@
 #define COLOR_PROP COLOR_GREEN
 #define COLOR_VAL COLOR_CYAN
 
-typedef std::array<std::string, ATTRIB_COUNT> str7;
-typedef std::array<int, ATTRIB_COUNT> int7;
-
 // struct for holding the point;
 struct car{
 	// every attribute as a string
 	std::array<std::string, ATTRIB_COUNT> attribs;
 
+	// every unique type of the attribute
+	static std::array<std::set<std::string>, ATTRIB_COUNT> attrib_sets;
+
 	// number of unique values for each attribute
 	static std::array<int, ATTRIB_COUNT> unique;
+
+	// amount of appearances for every attribute of every type
+	static std::array<std::map<std::string, int>, ATTRIB_COUNT> amount;
 
 	friend std::ostream& operator<<(std::ostream&, const car&);
 
 };
 
-int7 car::unique{0};
+std::array<std::set<std::string>, ATTRIB_COUNT> car::attrib_sets;
+std::array<int, ATTRIB_COUNT> car::unique{0};
+std::array<std::map<std::string, int>, ATTRIB_COUNT> car::amount;
 
 // hidden cout wrappers
 namespace{
@@ -95,24 +101,34 @@ namespace dr{
 	void read_data(std::string file, std::vector<car>& vec){
 		std::ifstream fs(file);
 		std::string data;
-		while(std::getline(fs, data))
+//		int limit = 0;
+		while(std::getline(fs, data)){
 			vec.push_back(parse_line(data));
+//			if(++limit >= 10)
+//				return;
+		}
+	}
+
+	void inc_map(std::map<std::string, int>& m, std::string at){
+		if(!m.count(at))
+			m.insert(std::make_pair(at, 1));
+		else m[at]++;
 	}
 
 	void calc_unique_values(std::vector<car>& data){
 
-		// sets for each attribute
-		std::array<std::set<std::string>, ATTRIB_COUNT> sets;
-
 		// fill the sets
 		auto end = data.end();
 		for(auto it = data.begin(); it != end; it++)
-			for(int i = 0; i < ATTRIB_COUNT; i++)
-				sets[i].insert(it->attribs[i]);
+			for(int i = 0; i < ATTRIB_COUNT; i++){
+				car::attrib_sets[i].insert(it->attribs[i]);
+				inc_map(car::amount[i], it->attribs[i]);
+			}
 
 		// get the unique values
 		for(int i = 0; i < ATTRIB_COUNT; i++)
-			car::unique[i] = sets[i].size();
+			car::unique[i] = car::attrib_sets[i].size();
+
 	}
 
 }
