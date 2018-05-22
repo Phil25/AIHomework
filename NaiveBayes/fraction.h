@@ -6,13 +6,16 @@
 
 struct fraction{
 	double nominator = 0, denominator = 1;
+	double snom = 0, sden = 0;
 
 	inline void smooth(double nominator, double denominator){
 		this->nominator += nominator;
 		this->denominator += denominator;
+		snom = nominator;
+		sden = denominator;
 	}
 
-	inline double result(){
+	inline double result() const{
 		return nominator /denominator;
 	}
 
@@ -21,12 +24,24 @@ struct fraction{
 		this->denominator *= other.denominator;
 	}
 
+	friend bool operator<=(const fraction&, const fraction&);
 	friend std::ostream& operator<<(std::ostream&, const fraction&);
 
 };
 
 std::ostream& operator<<(std::ostream& os, const fraction& frac){
-	return os << (frac.nominator /frac.denominator);
+	os << (frac.nominator -frac.snom) << '+' << frac.snom;
+	os << '/';
+	os << (frac.denominator -frac.sden) << '+' << frac.sden;
+	os << " = ";
+	os << frac.nominator << '/' << frac.denominator;
+	os << " = ";
+	os << frac.result();
+	return os;
+}
+
+bool operator<=(const fraction& a, const fraction& b){
+	return a.result() <= b.result();
 }
 
 #endif

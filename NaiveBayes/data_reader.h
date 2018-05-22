@@ -5,6 +5,8 @@
 #include <set>
 #include <map>
 
+#include "fraction.h"
+
 // number of coordinates in the data set
 #define ATTRIB_COUNT 7
 
@@ -31,6 +33,8 @@ struct car{
 	// every attribute as a string
 	std::array<std::string, ATTRIB_COUNT> attribs;
 
+	static std::array<std::string, ATTRIB_COUNT> attribs_cols;
+
 	// every unique type of the attribute
 	static std::array<std::set<std::string>, ATTRIB_COUNT> attrib_sets;
 
@@ -44,26 +48,44 @@ struct car{
 
 };
 
+std::array<std::string, ATTRIB_COUNT> car::attribs_cols = {
+	"Buying Price", "Maintenance Price", "Door Number", "Capacity", "Luggage Size", "Safety", "Acceptability"
+};
 std::array<std::set<std::string>, ATTRIB_COUNT> car::attrib_sets;
 std::array<int, ATTRIB_COUNT> car::unique{0};
 std::array<std::map<std::string, int>, ATTRIB_COUNT> car::amount;
 
-// hidden cout wrappers
-namespace{
+namespace dr{
 	void print_line(std::ostream& oss, std::string property, std::string value, std::string end){
 		oss << COLOR_PROP << property << COLOR_RESET << ": " << COLOR_VAL << value << COLOR_RESET << end;
+	}
+
+	std::string format_prob(const std::string& name, const std::string& value, const fraction& frac){
+		std::ostringstream oss;
+		oss << "P(" << COLOR_PROP << name << COLOR_RESET << '=' << COLOR_VAL << value << COLOR_RESET << ") = " << frac;
+		return oss.str();
+	}
+
+	std::string format_prob(const std::string& name, const std::string& value, const std::string& cond, const std::string& cond_value, const fraction& frac){
+		std::ostringstream oss;
+		oss << "P(";
+		oss << COLOR_PROP << name << COLOR_RESET << '=' << COLOR_VAL << value << COLOR_RESET;
+		oss << '|';
+		oss << COLOR_PROP << cond << COLOR_RESET << '=' << COLOR_VAL << cond_value << COLOR_RESET;
+		oss << ") = " << frac;
+		return oss.str();
 	}
 }
 
 std::ostream& operator<<(std::ostream& oss, const car& c){
 	oss << '{';
-	print_line(oss, "b. price", c.attribs[BUYING_PRICE], ", ");
-	print_line(oss, "m. price", c.attribs[MAINTENANCE_PRICE], ", ");
-	print_line(oss, "door num", c.attribs[DOOR_NUM], ", ");
-	print_line(oss, "capacity", c.attribs[CAPACITY], ", ");
-	print_line(oss, "luggage", c.attribs[LUGGAGE_SIZE], ", ");
-	print_line(oss, "safety", c.attribs[SAFETY], ", ");
-	print_line(oss, "acceptability", c.attribs[ACCEPTABILITY], "");
+	dr::print_line(oss, "b. price", c.attribs[BUYING_PRICE], ", ");
+	dr::print_line(oss, "m. price", c.attribs[MAINTENANCE_PRICE], ", ");
+	dr::print_line(oss, "door num", c.attribs[DOOR_NUM], ", ");
+	dr::print_line(oss, "capacity", c.attribs[CAPACITY], ", ");
+	dr::print_line(oss, "luggage", c.attribs[LUGGAGE_SIZE], ", ");
+	dr::print_line(oss, "safety", c.attribs[SAFETY], ", ");
+	dr::print_line(oss, "acceptability", c.attribs[ACCEPTABILITY], "");
 	oss << '}';
 	return oss;
 }
@@ -101,11 +123,11 @@ namespace dr{
 	void read_data(std::string file, std::vector<car>& vec){
 		std::ifstream fs(file);
 		std::string data;
-//		int limit = 0;
+		//int limit = 0;
 		while(std::getline(fs, data)){
 			vec.push_back(parse_line(data));
-//			if(++limit >= 10)
-//				return;
+			//if(++limit >= 10)
+				//return;
 		}
 	}
 
