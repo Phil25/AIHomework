@@ -1,5 +1,6 @@
 #include <ostream>
 #include <vector>
+#include <bitset>
 
 #ifndef CHAR_VECTOR_H
 #define CHAR_VECTOR_H
@@ -31,48 +32,57 @@ std::ostream& operator<<(std::ostream& os, const item& i){
 	return os;
 }
 
-struct char_vector : public std::vector<bool>{
+class char_vector{
+	static unsigned long last_vector;
+
+	unsigned long vector;
 	int weight = 0;
 	int value = 0;
 	int n = 0;
 
-	void resize(int new_size){
-		std::vector<bool>::resize(new_size);
-		n = new_size;
-	}
-
-	// binary increment vector of bools, (001 -> 010)
-	// returns false when overflow
-	bool increment(){
-		int i = -1;
-		do i++, operator[](i) = !operator[](i);
-		while(i < n && !operator[](i));
-		return i != n;
-	}
+public:
+	char_vector(int n):
+		vector(last_vector++),
+		weight(0),
+		value(0),
+		n(n)
+	{}
 
 	int sum_weights(std::vector<item>& items){
 		weight = 0;
 		for(int i = 0; i < n; i++)
-			weight += items[i].weight *operator[](i);
+			weight += items[i].weight *is_set(i);
 		return weight;
 	}
 
 	int sum_values(std::vector<item>& items){
 		value = 0;
 		for(int i = 0; i < n; i++)
-			value += items[i].value *operator[](i);
+			value += items[i].value *is_set(i);
 		return value;
 	}
+
+	bool operator<(const char_vector& other) const{
+		return vector < other.vector;
+	}
+
+private:
+	bool is_set(int at) const{
+		return (vector >> at) &1;
+	}
+
+	friend std::ostream& operator<<(std::ostream&, const char_vector&);
+
 };
+
+unsigned long char_vector::last_vector = 0;
 
 std::ostream& operator<<(std::ostream& os, const char_vector& cv){
 	os << '{';
 		os << COLOR_PROP << "vector" << COLOR_RESET;
 		os << "={";
-			os << COLOR_VAL;
-			for(bool b : cv)
-				os << b;
-			os << COLOR_RESET;
+			for(int i = 0; i < cv.n; i++)
+				os << cv.is_set(i);
 		os << "}, ";
 		os << COLOR_PROP << "weight" << COLOR_RESET;
 		os << '=';

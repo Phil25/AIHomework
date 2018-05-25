@@ -41,7 +41,7 @@ namespace dr{
 		int limit = 0;
 		while(std::getline(fs, data)){
 			vec.push_back(parse_line(data));
-			if(++limit > 4)
+			if(++limit > 6)
 				break;
 		}
 		return cap;
