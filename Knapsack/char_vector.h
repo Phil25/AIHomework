@@ -15,6 +15,8 @@
 #define COLOR_PROP COLOR_GREEN
 #define COLOR_VAL COLOR_CYAN
 
+
+
 struct item{
 	int weight, value;
 };
@@ -32,6 +34,37 @@ std::ostream& operator<<(std::ostream& os, const item& i){
 	return os;
 }
 
+namespace cv{
+	bool is_set(int num, int at){
+		return (num >> at) &1;
+	}
+
+	int get_weight(int vector, std::vector<item>& items, int n){
+		int weight = 0;
+		for(int i = 0; i < n; i++)
+			weight += items[i].weight *is_set(vector, i);
+		return weight;
+	}
+
+	int get_value(int vector, std::vector<item>& items, int n){
+		int value = 0;
+		for(int i = 0; i < n; i++)
+			value += items[i].value *is_set(vector, i);
+		return value;
+	}
+
+	struct print{
+		int vector, n;
+	};
+
+	std::ostream& operator<<(std::ostream& os, const print& p){
+		for(int i = 0; i < p.n; ++i)
+			os << is_set(p.vector, i);
+		return os;
+	}
+}
+
+/*
 class char_vector{
 	static unsigned long last_vector;
 
@@ -94,6 +127,7 @@ std::ostream& operator<<(std::ostream& os, const char_vector& cv){
 	os << '}';
 	return os;
 }
+*/
 
 
 #endif

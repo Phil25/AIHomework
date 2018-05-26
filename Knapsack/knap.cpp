@@ -2,50 +2,48 @@
 
 #include "data_reader.h"
 
-// generate characteristic vectors by incrementing 0-vector until overflow
-void gen_char_vectors(std::vector<char_vector>& char_vectors, unsigned int n){
+// find charasterictic vectors, with weight <= capacity
+void get_feasible(std::vector<int>& char_vectors, int n, std::vector<item>& items, int capacity){
 	unsigned long max = 2;
 	unsigned long i = n-1;
 	while(max *= 2, --i > 0);
-	while(char_vectors.push_back(char_vector(n)), ++i < max);
+	while(++i < max)
+		if(cv::get_weight(i, items, n) <= capacity)
+			char_vectors.push_back(i);
 }
 
-// remove characteristic vectors based on the items vector and capacity
-void filter(std::vector<char_vector>& char_vectors, std::vector<item>& items, int c){
-	auto cv = char_vectors.begin();
-	while(cv != char_vectors.end()){
-		if(cv->sum_weights(items) > c)
-			cv = char_vectors.erase(cv);
-		else cv++;
-	}
-}
-
-char_vector most_valuable(std::vector<char_vector>& char_vectors, std::vector<item>& items){
+int get_optimal(std::vector<int>& char_vectors, std::vector<item>& items, int n){
 	int best_value = 0;
-	char_vector* best_vector;
-	std::cout << "\n\t[FILTERED]" << std::endl;
-	for(char_vector& cv : char_vectors){
-		int value = cv.sum_values(items);
-		std::cout << cv << std::endl;
+	int best_vector = 0;
+	for(const int& vector : char_vectors){
+		int value = cv::get_value(vector, items, n);
 		if(value <= best_value)
 			continue;
-		best_vector = &cv;
+		best_vector = vector;
 		best_value = value;
 	}
-	return *best_vector;
+	return best_vector;
 }
 
-char_vector knapsack(std::vector<item>& items, int capacity){
-	// generate characteristic vectors
-	std::vector<char_vector> char_vectors;
-	gen_char_vectors(char_vectors, items.size());
+int knapsack(std::vector<item>& items, int capacity, int n){
+	std::vector<int> char_vectors;
 
-	// filter out all unfeasable solutions
-	filter(char_vectors, items, capacity);
+	// assign feasable solutions
+	get_feasible(char_vectors, n, items, capacity);
 
-	// get the most valueable combination
-	return most_valuable(char_vectors, items);
+	std::cout << "\n\t[FEASABLE]" << std::endl;
+	for(const int& vector : char_vectors)
+		std::cout << cv::print{vector, n} << std::endl;
 
+	// get the most valuable combination
+	return get_optimal(char_vectors, items, n);
+
+}
+
+void print_bin(int num, int size){
+	for(int i = 0; i < size; i++)
+		std::cout << cv::is_set(num, i);
+	std::cout << std::endl;
 }
 
 int main(){
@@ -53,15 +51,19 @@ int main(){
 	std::vector<item> items;
 	int capacity = dr::read_data("knapsack_data/13", items);
 	capacity = 70;
+	int n = items.size();
 
 	std::cout << "\n\t[INPUT]" << std::endl;
 	std::cout << "Capacity: " << capacity << std::endl;
+	std::cout << "n: " << n << std::endl;
 	for(auto i : items)
 		std::cout << i << std::endl;
 
-	char_vector result = knapsack(items, capacity);
-	std::cout << "\n\t[SOLUTION]" << std::endl;
-	std::cout << result << std::endl;
+	int result = knapsack(items, capacity, n);
+	std::cout << "\n\t[OPTIMAL]" << std::endl;
+	std::cout << cv::print{result, n} << std::endl;
+	std::cout << "Weight: " << cv::get_weight(result, items, n) << std::endl;
+	std::cout << "Value: " << cv::get_value(result, items, n) << std::endl;
 
 	return 0;
 }
