@@ -18,7 +18,7 @@
 
 
 struct item{
-	int weight, value;
+	int value, weight;
 };
 
 std::ostream& operator<<(std::ostream& os, const item& i){
