@@ -41,9 +41,10 @@ namespace dr{
 		int limit = 0;
 		while(std::getline(fs, data)){
 			vec.push_back(parse_line(data));
-			if(++limit > 66)
+			if(++limit > 60)
 				break;
 		}
+
 		return cap;
 	}
 
