@@ -1,3 +1,3 @@
 #!/bin/bash
 
-g++ ./knap.cpp -o knap
+g++ ./knap.cpp -o knap -O2

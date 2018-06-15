@@ -34,7 +34,7 @@ int knapsack(std::vector<item>& items, int capacity, int n){
 int main(){
 
 	std::vector<item> items;
-	int capacity = dr::read_data("knapsack_data/13", items);
+	int capacity = dr::read_data("knapsack_data/14", items);
 	//capacity = 70;
 	int n = items.size();
 
