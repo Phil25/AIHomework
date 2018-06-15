@@ -12,6 +12,12 @@
 #define COLOR_PROP COLOR_GREEN
 #define COLOR_VAL COLOR_CYAN
 
+int rand(int min, int max){
+	static int seed = std::time(0);
+	std::srand(seed++);
+	return min +(std::rand() %(max -min));
+}
+
 template <int S>
 class sol{
 	std::array<int, S +1> data;
@@ -23,6 +29,11 @@ public:
 		for(int& val : data)
 			val = i++;
 		data[S] = 0;
+	}
+
+	void rand_shuffle(){
+		for(int i = 1; i < S; i++)
+			swap(i, rand(i, S));
 	}
 
 	void set(const sol<S>& other){

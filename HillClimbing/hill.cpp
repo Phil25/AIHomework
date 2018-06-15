@@ -3,7 +3,7 @@
 #include "data_reader.h"
 #include "sol.h"
 
-#define TEST
+//#define TEST
 
 #ifdef TEST
 #define SIZE 15
@@ -47,7 +47,7 @@ bool change_neighbour(sol<SIZE>& s, const graph& g){
 	std::cout << COLOR_PROP << "  Swapped: " << COLOR_RESET;
 	for(int i = 0; i < best_swap; i++)
 		std::cout << "      ";
-	std::cout << COLOR_PROP << " ^     ^" << COLOR_RESET << std::endl;;
+	std::cout << COLOR_RED << " ^     ^" << COLOR_RESET << std::endl;;
 
 	s.set(best);
 	return true;
@@ -55,6 +55,7 @@ bool change_neighbour(sol<SIZE>& s, const graph& g){
 
 void tsp_climb(const graph& g){
 	sol<SIZE> s;
+	s.rand_shuffle();
 	while(change_neighbour(s, g));
 }
 
